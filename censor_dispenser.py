@@ -37,16 +37,36 @@ def negative_remove(email, neg_terms):
 			email = email.replace(term.upper() + ' ', '#' * len(term) + ' ')
 
 	return email
-def censor_neg_remove_email(email, neg_terms, prop_terms):
-	email = negative_remove(email, neg_terms)
-	email = censor_email(email, prop_terms)
+
+def censor_neg_remove_email(email):
+	email = negative_remove(email, negative_words)
+	email = censor_email(email, proprietary_terms)
 
 	return email
 
+# Censors the immediate word before and after a word that is already censored 
+def super_censor(email):
+	email = censor_neg_remove_email(email)
 
-print(email_three)
-print(censor_neg_remove_email(email_three, negative_words, proprietary_terms))
+	spl_email = email.split()
 
+	siter = iter(range(len(spl_email)))
+	for i in siter:
+		if spl_email[i] == '#' * len(spl_email[i]):
+			if i > 0:
+				spl_email[i - 1] = '#' * len(spl_email[i - 1])
+			if i < len(spl_email) - 1:
+				spl_email[i + 1] = '#' * len(spl_email[i + 1])
+				next(siter, None)
+
+	return ' '.join(spl_email)
+
+
+###				Main					###
+
+#print(email_two)
+email_four = super_censor(email_four)
+print(email_four)
 
 
 
